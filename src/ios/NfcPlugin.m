@@ -73,6 +73,10 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+% - (void)writeTag:(CDVInvokedUrlCommand *)command {
+    NSLog("!!!!!!!!!!!!!!!!!!starting to write")
+% }
+
 #pragma mark - NFCNDEFReaderSessionDelegate
 
 - (void) readerSession:(NFCNDEFReaderSession *)session didDetectNDEFs:(NSArray<NFCNDEFMessage *> *)messages {
@@ -84,7 +88,7 @@
 }
 
 - (void) readerSession:(NFCNDEFReaderSession *)session didInvalidateWithError:(NSError *)error {
-    NSLog(@"didInvalidateWithError %@ %@", error.localizedDescription, error.localizedFailureReason);
+    // NSLog(@"didInvalidateWithError %@ %@", error.localizedDescription, error.localizedFailureReason);
     if (ndefStartSessionCallbackId) {
         NSString* errorMessage = [NSString stringWithFormat:@"error: %@", error.localizedDescription];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];

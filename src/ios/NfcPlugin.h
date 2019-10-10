@@ -22,6 +22,7 @@
 - (void)registerNdef:(CDVInvokedUrlCommand *)command;
 - (void)removeNdef:(CDVInvokedUrlCommand *)command;
 - (void)enabled:(CDVInvokedUrlCommand *)command;
+- (void)writeTag:(CDVInvokedUrlCommand *)command;
 
 @end
 

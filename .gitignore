@@ -7,4 +7,5 @@ Makefile
 .idea
 *.iml
 .project
+.vscode/
 out/
