@@ -17,7 +17,7 @@
 - (void)pluginInitialize {
 
     NSLog(@"PhoneGap NFC - Cordova Plugin");
-    NSLog(@"(c)2017 Don Coleman");
+    NSLog(@"(c)2017 Don Coleman MWAHAHAHA! :D");
 
     [super pluginInitialize];
     
@@ -31,9 +31,9 @@
 
 // Unfortunately iOS users need to start a session to read tags
 - (void)beginSession:(CDVInvokedUrlCommand*)command {
-    NSLog(@"beginSession");
+    NSLog(@"beginSession MWAHAHAHA! :D");
 
-    _nfcSession = [[NFCNDEFReaderSession new]initWithDelegate:self queue:nil invalidateAfterFirstRead:TRUE];
+    _nfcSession = [[NFCNDEFReaderSession new]initWithDelegate:self queue:nil invalidateAfterFirstRead:FALSE];
     ndefStartSessionCallbackId = [command.callbackId copy];
     [_nfcSession beginSession];
 }
@@ -50,7 +50,7 @@
 
 // Nothing happens here, the event listener is registered in JavaScript
 - (void)registerNdef:(CDVInvokedUrlCommand *)command {
-    NSLog(@"registerNdef");
+    NSLog(@"registerNdef ");
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -73,9 +73,15 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-% - (void)writeTag:(CDVInvokedUrlCommand *)command {
-    NSLog("!!!!!!!!!!!!!!!!!!starting to write")
-% }
+- (void)writeTag:(CDVInvokedUrlCommand*)command {
+    NSLog(@"!!!!!!!!!!!!!!!!!!starting to write");
+    NSLog(@"%@", [command arguments][0]);
+    NSLog(@"!!!!!!!!!!!!!!!!!!I am done writing");
+}
+
+- (void)channel:(CDVInvokedUrlCommand *)command {
+    NSLog(@"CHANNELING!!!!!!!!!!!!!!!! or whatever...");
+}
 
 #pragma mark - NFCNDEFReaderSessionDelegate
 
