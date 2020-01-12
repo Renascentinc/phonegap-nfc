@@ -22,7 +22,7 @@
 - (void)registerNdef:(CDVInvokedUrlCommand *)command;
 - (void)removeNdef:(CDVInvokedUrlCommand *)command;
 - (void)enabled:(CDVInvokedUrlCommand *)command;
-- (void)writeTag:(CDVInvokedUrlCommand *)command :(NSDictionary*)options;
+- (void)writeTag:(CDVInvokedUrlCommand *)command;
 - (void)channel:(CDVInvokedUrlCommand *)command;
 
 @end

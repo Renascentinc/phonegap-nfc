@@ -10,6 +10,7 @@
     NSString* ndefStartSessionCallbackId;
 }
 @property (strong, nonatomic) NFCNDEFReaderSession *nfcSession;
+@property (strong, nonatomic) id<NFCNDEFTag> connectedTag;
 @end
 
 @implementation NfcPlugin
@@ -33,7 +34,7 @@
 - (void)beginSession:(CDVInvokedUrlCommand*)command {
     NSLog(@"beginSession MWAHAHAHA! :D");
 
-    _nfcSession = [[NFCNDEFReaderSession new]initWithDelegate:self queue:nil invalidateAfterFirstRead:FALSE];
+    _nfcSession = [[NFCNDEFReaderSession new]initWithDelegate:self queue:nil invalidateAfterFirstRead:TRUE];
     ndefStartSessionCallbackId = [command.callbackId copy];
     [_nfcSession beginSession];
 }
@@ -50,7 +51,7 @@
 
 // Nothing happens here, the event listener is registered in JavaScript
 - (void)registerNdef:(CDVInvokedUrlCommand *)command {
-    NSLog(@"registerNdef ");
+    NSLog(@"registerNdef");
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -76,7 +77,9 @@
 - (void)writeTag:(CDVInvokedUrlCommand*)command {
     NSLog(@"!!!!!!!!!!!!!!!!!!starting to write");
     NSLog(@"%@", [command arguments][0]);
-    NSLog(@"!!!!!!!!!!!!!!!!!!I am done writing");
+    [_connectedTag writeNDEF:((NFCNDEFMessage) [command arguments][0]) completionHandler:^(NSError * _Nullable error) {
+        NSLog(@"Successfully wrote to tag");
+    }];
 }
 
 - (void)channel:(CDVInvokedUrlCommand *)command {
@@ -85,11 +88,23 @@
 
 #pragma mark - NFCNDEFReaderSessionDelegate
 
-- (void) readerSession:(NFCNDEFReaderSession *)session didDetectNDEFs:(NSArray<NFCNDEFMessage *> *)messages {
-    NSLog(@"NFCNDEFReaderSession didDetectNDEFs");
+- (void) readerSession:(NFCNDEFReaderSession *)session didDetectTags:(NSArray<__kindof id<NFCNDEFTag>> *)tags {
+    NSLog(@"NFCNDEFReaderSession didDetectTags");
     
-    for (NFCNDEFMessage *message in messages) {
-        [self fireNdefEvent: message];
+    for (id<NFCNDEFTag> tag in tags) {
+        [_nfcSession connectToTag:tag completionHandler:^(NSError * _Nullable error) {
+            if (!error) {
+                [tag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
+                    if (!error) {
+                        _connectedTag = tag;
+                        [self fireNdefEvent: message];
+                    }
+                    else {
+                        NSLog(@"%@", error);
+                    }
+                }];
+            }
+        }];
     }
 }
 
@@ -111,6 +126,10 @@
         ndefStartSessionCallbackId = NULL;
     }
 }
+
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages { 
+}
+
 
 #pragma mark - internal implementation
 
