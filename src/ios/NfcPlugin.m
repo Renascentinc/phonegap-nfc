@@ -75,11 +75,43 @@
 }
 
 - (void)writeTag:(CDVInvokedUrlCommand*)command {
-    NSLog(@"!!!!!!!!!!!!!!!!!!starting to write");
-    NSLog(@"%@", [command arguments][0]);
-    [_connectedTag writeNDEF:((NFCNDEFMessage) [command arguments][0]) completionHandler:^(NSError * _Nullable error) {
-        NSLog(@"Successfully wrote to tag");
+    NSLog(@"1");
+    NSLog(@"%@", [command arguments][0][0][@"type"]);
+    NSString *strType = @"84";
+    NSLog(@"2");
+    NSString *strId = @"10";
+    NSLog(@"3");
+    NSArray<NSNumber *> *strPayload = [[NSArray alloc] initWithArray:[command arguments][0][0][@"payload"]];
+    NSLog(@"%@", strPayload);
+    NSLog(@"4");
+    NSMutableArray<NFCNDEFPayload*> * mutRecords;
+    NSLog(@"5");
+    NSLog(@"%@", [strPayload[1] class]);
+    for (NSNumber* payloadRecord in strPayload) {
+        NSLog(@"6*");
+        [mutRecords addObject:[[NFCNDEFPayload alloc]
+        initWithFormat:NFCTypeNameFormatNFCWellKnown
+        type:[strType dataUsingEncoding:NSUTF8StringEncoding]
+        identifier:[strId dataUsingEncoding:NSUTF8StringEncoding]
+                            payload:payloadRecord]];
+    }
+    NSLog(@"7");
+    NSArray<NFCNDEFPayload*> * records = [NSArray arrayWithObject:mutRecords];
+    NSLog(@"8");
+//
+//    NSArray<NFCNDEFPayload *> *payload = [command arguments][0][0][@"payload"];
+    NFCNDEFMessage *message;
+    NSLog(@"9");
+//    NFCNDEFMessage *message;
+    message = [message initWithNDEFRecords:records];
+    NSLog(@"10");
+    [self.connectedTag writeNDEF:message completionHandler:^(NSError * _Nullable error) {
+        NSLog(@"There was an error while writing to the tag");
+        NSLog(@"%@", error);
+        [_nfcSession invalidateSession];
     }];
+    NSLog(@"11");
+    [_nfcSession invalidateSession];
 }
 
 - (void)channel:(CDVInvokedUrlCommand *)command {
@@ -96,8 +128,9 @@
             if (!error) {
                 [tag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
                     if (!error) {
-                        _connectedTag = tag;
+                        self.connectedTag = tag;
                         [self fireNdefEvent: message];
+                        NSLog(@"we have connected a tag");
                     }
                     else {
                         NSLog(@"%@", error);
